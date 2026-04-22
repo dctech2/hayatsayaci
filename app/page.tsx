@@ -29,7 +29,7 @@ const comparisons = [
 export default function Home() {
   const [value, setValue] = useState("");
   const [age, setAge] = useState("");
-  const [dailyCost, setDailyCost] = useState("50"); // varsayılan TL
+  const [dailyCost, setDailyCost] = useState(""); // varsayılan TL
   const [result, setResult] = useState<number | null>(null);
   const [message, setMessage] = useState("");
   const [comparison, setComparison] = useState("");
