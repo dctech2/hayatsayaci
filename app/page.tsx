@@ -26,33 +26,56 @@ const comparisons = [
   "Yüzlerce sayfa kitap okuyabilirdin 📚"
 ];
 
+const alternatives = {
+  kisa: [
+    "Bir kitap bitirebilirdin 📚",
+    "Yeni bir alışkanlık başlatabilirdin 🚀",
+    "Kendine zaman ayırabilirdin 🧘"
+  ],
+  orta: [
+    "Temel seviyede yeni bir dil öğrenebilirdin 🌍",
+    "Düzenli spor yaparak form kazanabilirdin 💪",
+    "Küçük bir yan gelir oluşturabilirdin 💸"
+  ],
+  uzun: [
+    "Yeni bir meslek öğrenebilirdin 🎯",
+    "Hayatını değiştirecek bir beceri kazanabilirdin 🚀",
+    "Kendi işini kurmaya başlayabilirdin 💼"
+  ]
+};
+
 export default function Home() {
   const [value, setValue] = useState("");
   const [age, setAge] = useState("");
-  const [dailyCost, setDailyCost] = useState(""); // varsayılan TL
+  const [dailyIncome, setDailyIncome] = useState("");
+  const [aiText, setAiText] = useState("");
+
   const [result, setResult] = useState<number | null>(null);
   const [message, setMessage] = useState("");
   const [comparison, setComparison] = useState("");
   const [money, setMoney] = useState<number | null>(null);
+  money: money || 0
+  const [altList, setAltList] = useState<string[]>([]);
 
   const calculate = () => {
     const hours = parseFloat(value);
-    const cost = parseFloat(dailyCost);
+    const income = parseFloat(dailyIncome);
 
     if (!isNaN(hours)) {
-      const yearly = hours * 365;
-      setResult(yearly);
+      const yearlyHours = hours * 365;
+      setResult(yearlyHours);
+
+      const days = Math.round(yearlyHours / 24);
 
       // mesaj seviyesi
       let level: "kucuk" | "orta" | "buyuk" = "kucuk";
-      if (yearly > 500) level = "buyuk";
-      else if (yearly > 150) level = "orta";
+      if (yearlyHours > 500) level = "buyuk";
+      else if (yearlyHours > 150) level = "orta";
 
       const randomMessage =
         messages.yuzlesme[level][
           Math.floor(Math.random() * messages.yuzlesme[level].length)
         ];
-
       setMessage(randomMessage);
 
       // kıyas
@@ -60,21 +83,52 @@ export default function Home() {
         comparisons[Math.floor(Math.random() * comparisons.length)];
       setComparison(randomComparison);
 
-      // para hesap
-      if (!isNaN(cost)) {
-        const estimatedMoney = cost * 365;
+      // 💥 PARA (DOĞRU MODEL)
+      if (!isNaN(income)) {
+        const estimatedMoney = days * income;
         setMoney(estimatedMoney);
+      } else {
+        setMoney(null);
       }
+
+      // 🎯 ALTERNATİF HAYAT
+      let altLevel = "kisa";
+
+      if (days > 20) altLevel = "uzun";
+      else if (days > 7) altLevel = "orta";
+
+      const selected = alternatives[altLevel as keyof typeof alternatives];
+      const shuffled = selected.sort(() => 0.5 - Math.random());
+      setAltList(shuffled.slice(0, 2));
     }
+fetch("/api/ai", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    hours: value,
+    days: Math.round((hours * 365) / 24),
+    money: money,
+    age: age,
+  }),
+})
+  .then((res) => res.json())
+  .then((data) => {
+    setAiText(data.text);
+  });
+
   };
 
   const reset = () => {
     setValue("");
     setAge("");
+    setDailyIncome("");
     setResult(null);
     setMessage("");
     setComparison("");
     setMoney(null);
+    setAltList([]);
   };
 
   const days = result ? Math.round(result / 24) : 0;
@@ -85,7 +139,7 @@ export default function Home() {
 
         <div className="bg-white/10 backdrop-blur-lg border border-white/10 rounded-2xl p-8 text-center shadow-2xl">
 
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight drop-shadow-lg">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
             Hayatın nereye gidiyor?
           </h1>
 
@@ -93,7 +147,6 @@ export default function Home() {
             Küçük alışkanlıklarının sana gerçekte neye mal olduğunu gör.
           </p>
 
-          {/* Saat */}
           <input
             type="number"
             placeholder="Günde kaç saat harcıyorsun? (örn: 2)"
@@ -102,16 +155,14 @@ export default function Home() {
             className="w-full p-4 rounded-xl bg-white text-black mb-4"
           />
 
-          {/* TL */}
           <input
             type="number"
-            placeholder="Günde kaç TL harcıyorsun? (örn: 50)"
-            value={dailyCost}
-            onChange={(e) => setDailyCost(e.target.value)}
+            placeholder="Günde ne kadar kazanıyorsun? (örn: 1000 TL)"
+            value={dailyIncome}
+            onChange={(e) => setDailyIncome(e.target.value)}
             className="w-full p-4 rounded-xl bg-white text-black mb-4"
           />
 
-          {/* Yaş */}
           <input
             type="number"
             placeholder="Kaç yaşındasın? (örn: 25)"
@@ -120,7 +171,6 @@ export default function Home() {
             className="w-full p-4 rounded-xl bg-white text-black mb-4"
           />
 
-          {/* Hızlı seçim */}
           <div className="flex flex-wrap gap-2 justify-center mb-6">
             <button onClick={() => setValue("2")} className="bg-white/10 px-4 py-2 rounded-full text-sm">
               📱 Instagram
@@ -157,7 +207,7 @@ export default function Home() {
 
               {days > 20 && (
                 <p className="text-red-600 font-bold">
-                  Bu artık küçük bir alışkanlık değil.
+                  Bu artık kontrolünü kaybettiğin bir alışkanlık.
                 </p>
               )}
 
@@ -167,7 +217,7 @@ export default function Home() {
 
               {money && (
                 <p className="text-green-400 font-semibold">
-                  Bu alışkanlık sana yılda yaklaşık {money.toLocaleString()} TL’ye mal oluyor
+                  Bu alışkanlık sana yılda yaklaşık {money.toLocaleString()} TL kaybettiriyor
                 </p>
               )}
 
@@ -185,12 +235,13 @@ export default function Home() {
                 Senin gibi kullanıcılar günde ortalama 2-3 saatini kaybediyor.
               </p>
 
+              {/* 🎯 JSON ALTERNATİFLER */}
               <div className="text-gray-400">
-                <p>Bu süreyle:</p>
-                <ul>
-                  <li>• Yeni bir beceri öğrenebilirdin</li>
-                  <li>• Kendine yatırım yapabilirdin</li>
-                  <li>• Daha sağlıklı bir rutin oluşturabilirdin</li>
+                <p>Bu süreyle şunları yapabilirdin:</p>
+                <ul className="mt-2 space-y-1">
+                  {altList.map((item, i) => (
+                    <li key={i}>• {item}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -204,7 +255,11 @@ export default function Home() {
               >
                 Paylaş
               </button>
-
+{aiText && (
+  <div className="mt-6 p-4 bg-white/10 rounded-xl text-white text-lg">
+    {aiText}
+  </div>
+)}
               <button onClick={reset} className="text-gray-400 underline mt-2">
                 Tekrar dene
               </button>
