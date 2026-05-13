@@ -107,7 +107,7 @@ export default function Home() {
 
       {/* HEADER */}
       <div className="text-center pt-10 pb-8 relative z-10">
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black bg-gradient-to-r from-white via-gray-300 to-gray-600 bg-clip-text text-transparent">
+        <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-white via-gray-300 to-gray-600 bg-clip-text text-transparent">
           Hayat Analizi AI 🚀
         </h1>
 
@@ -117,9 +117,9 @@ export default function Home() {
       </div>
 
       {/* CONTENT */}
-      <div className="max-w-7xl mx-auto px-6 pb-12 flex flex-col xl:flex-row gap-8 relative z-10 items-start">
+      <div className="max-w-7xl mx-auto px-6 pb-12 flex flex-col lg:flex-row gap-8 relative z-10 items-start">
         {/* LEFT */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 flex-1">
 
           {cards.map((card) => {
             const Icon = card.icon;
@@ -129,7 +129,7 @@ export default function Home() {
                 key={card.id}
                 onClick={() => setActive(card.id)}
                 className={`
-                  h-32 sm:h-36 lg:h-40 rounded-3xl
+                  h-40 rounded-3xl
                   bg-gradient-to-br ${card.color}
                   flex flex-col items-center justify-center
                   cursor-pointer
@@ -144,9 +144,9 @@ export default function Home() {
                   }
                 `}
               >
-                <Icon className="w-10 h-10 lg:w-12 lg:h-12" />
+                <Icon size={42} />
 
-                <p className="mt-3 text-lg lg:text-xl font-bold">
+                <p className="mt-4 text-xl font-bold">
                   {card.title}
                 </p>
               </div>
@@ -156,7 +156,7 @@ export default function Home() {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-full xl:w-[420px] sticky top-6 bg-white/5 border border-white/10 rounded-[30px] p-6 backdrop-blur-xl min-h-[750px] shadow-[0_0_50px_rgba(255,255,255,0.06)]">
+        <div className="w-full lg:w-[420px] sticky top-6 bg-white/5 border border-white/10 rounded-[30px] p-6 backdrop-blur-xl min-h-[750px] shadow-[0_0_50px_rgba(255,255,255,0.06)]">
 
           {active === "time" && <TimePanel />}
 
