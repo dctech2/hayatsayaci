@@ -261,7 +261,7 @@ function TimePanel() {
 
         <input
           type="number"
-          placeholder="Günde kaç saat?"
+          placeholder="Günde kaç saatini boşa harcıyorsun?"
           value={hours}
           onChange={(e) =>
             setHours(e.target.value)
