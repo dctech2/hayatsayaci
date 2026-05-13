@@ -1,168 +1,455 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
-  Clock,
-  DollarSign,
-  Phone,
-  Percent,
-  CalendarDays,
-  Smartphone,
-  Moon,
-  Timer,
-  HeartPulse,
-  Cake,
-  Sparkles,
-  CalendarCheck,
-  Share2,
   Brain,
-  AlertTriangle,
+  Calendar,
+  Clock3,
   Activity,
+  TrendingUp,
+  HeartPulse,
+  Sparkles,
+  AlertTriangle,
+  Share2,
 } from "lucide-react";
 
-const cards = [
-  {
-    id: "time",
-    title: "Zaman",
-    icon: Clock,
-    color: "from-red-500 to-red-700",
-  },
-  {
-    id: "money",
-    title: "Para",
-    icon: DollarSign,
-    color: "from-green-500 to-green-700",
-  },
-  {
-    id: "life",
-    title: "Yaşam",
-    icon: CalendarDays,
-    color: "from-blue-500 to-blue-700",
-  },
-  {
-    id: "percent",
-    title: "%",
-    icon: Percent,
-    color: "from-purple-500 to-purple-700",
-  },
-  {
-    id: "phone",
-    title: "Telefon",
-    icon: Phone,
-    color: "from-yellow-400 to-yellow-600",
-  },
-  {
-    id: "social",
-    title: "Sosyal",
-    icon: Smartphone,
-    color: "from-pink-500 to-pink-700",
-  },
-  {
-    id: "sleep",
-    title: "Uyku",
-    icon: Moon,
-    color: "from-indigo-500 to-indigo-700",
-  },
-  {
-    id: "second",
-    title: "Saniye",
-    icon: Timer,
-    color: "from-cyan-500 to-cyan-700",
-  },
-  {
-    id: "heart",
-    title: "Kalp",
-    icon: HeartPulse,
-    color: "from-rose-500 to-rose-700",
-  },
-  {
-    id: "birth",
-    title: "Doğum",
-    icon: Cake,
-    color: "from-emerald-500 to-emerald-700",
-  },
-  {
-    id: "zodiac",
-    title: "Burç",
-    icon: Sparkles,
-    color: "from-orange-500 to-orange-700",
-  },
-  {
-    id: "day",
-    title: "Gün",
-    icon: CalendarCheck,
-    color: "from-teal-500 to-teal-700",
-  },
-];
-
 export default function Home() {
-  const [active, setActive] = useState("time");
+  const [birthDate, setBirthDate] = useState("");
+  const [dailyLostHours, setDailyLostHours] =
+    useState("");
+
+  const [secondsAlive, setSecondsAlive] =
+    useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!birthDate) return;
+
+      const birth = new Date(birthDate);
+
+      const diff =
+        (Date.now() - birth.getTime()) / 1000;
+
+      setSecondsAlive(Math.floor(diff));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [birthDate]);
+
+  const analysis = useMemo(() => {
+    if (!birthDate) return null;
+
+    const birth = new Date(birthDate);
+
+    const now = new Date();
+
+    const ageMs =
+      now.getTime() - birth.getTime();
+
+    const livedDays = Math.floor(
+      ageMs / (1000 * 60 * 60 * 24)
+    );
+
+    const livedYears = (
+      livedDays / 365
+    ).toFixed(1);
+
+    const averageLifeDays = 75 * 365;
+
+    const lifePercent = Math.min(
+      100,
+      Math.round(
+        (livedDays / averageLifeDays) * 100
+      )
+    );
+
+    const remainingDays =
+      averageLifeDays - livedDays;
+
+    const lostHours =
+      Number(dailyLostHours || 0);
+
+    const yearlyLostDays = Math.round(
+      (lostHours * 365) / 24
+    );
+
+    const projectedLostYears = (
+      (yearlyLostDays *
+        Math.max(1, 75 - Number(livedYears))) /
+      365
+    ).toFixed(1);
+
+    let risk = "";
+    let ai = "";
+    let aura = "";
+
+    if (lifePercent < 25) {
+      aura = "Hayatının başlangıç seviyesindesin 🚀";
+    } else if (lifePercent < 50) {
+      aura =
+        "Hayatının en kritik dönemindesin ⚡";
+    } else if (lifePercent < 75) {
+      aura =
+        "Zaman artık daha değerli hale geliyor ⏳";
+    } else {
+      aura =
+        "Hayat zamanını dikkatli kullanman gereken dönemdesin 🌙";
+    }
+
+    if (yearlyLostDays < 15) {
+      risk = "Düşük Risk";
+      ai =
+        "Zaman kullanımın şu an dengeli görünüyor.";
+    } else if (yearlyLostDays < 40) {
+      risk = "Orta Risk";
+      ai =
+        "Bazı alışkanlıkların hayat enerjini tüketiyor olabilir.";
+    } else {
+      risk = "Yüksek Risk";
+      ai =
+        "Bu tempo devam ederse yıllarını kaybedebilirsin.";
+    }
+
+    const score = Math.max(
+      0,
+      100 - yearlyLostDays
+    );
+
+    return {
+      livedDays,
+      livedYears,
+      lifePercent,
+      remainingDays,
+      yearlyLostDays,
+      projectedLostYears,
+      risk,
+      ai,
+      aura,
+      score,
+    };
+  }, [birthDate, dailyLostHours]);
+
+  const share = async () => {
+    if (!analysis) return;
+
+    await navigator.share?.({
+      title: "Hayat Analizi AI",
+      text: `😳 Hayatımın %${analysis.lifePercent}'ini yaşadım!`,
+      url: window.location.href,
+    });
+  };
 
   return (
-    <main className="min-h-screen bg-black text-white overflow-hidden">
+    <main className="min-h-screen bg-black text-white overflow-hidden relative">
 
-      {/* BG EFFECT */}
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(255,0,100,0.15),transparent_40%)] pointer-events-none" />
+      {/* BACKGROUND */}
+      <div className="absolute top-0 left-0 w-[700px] h-[700px] bg-pink-500/10 blur-[150px] rounded-full" />
+
+      <div className="absolute bottom-0 right-0 w-[700px] h-[700px] bg-cyan-500/10 blur-[150px] rounded-full" />
 
       {/* HEADER */}
-      <div className="text-center pt-10 pb-8 relative z-10">
-        <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-white via-gray-300 to-gray-600 bg-clip-text text-transparent">
-          Hayat Analizi AI 🚀
-        </h1>
+      <div className="relative z-10 text-center pt-12 px-6">
 
-        <p className="text-gray-400 mt-4">
-          Hayatının görünmeyen istatistiklerini keşfet
-        </p>
-      </div>
+        <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
 
-      {/* CONTENT */}
-      <div className="max-w-7xl mx-auto px-6 pb-12 flex flex-col lg:flex-row gap-8 relative z-10 items-start">
-        {/* LEFT */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 flex-1">
+          <Sparkles className="text-pink-400" />
 
-          {cards.map((card) => {
-            const Icon = card.icon;
-
-            return (
-              <div
-                key={card.id}
-                onClick={() => setActive(card.id)}
-                className={`
-                  h-40 rounded-3xl
-                  bg-gradient-to-br ${card.color}
-                  flex flex-col items-center justify-center
-                  cursor-pointer
-                  transition-all duration-300
-                  hover:scale-105 hover:-translate-y-2
-                  hover:shadow-[0_0_60px_rgba(255,255,255,0.18)]
-                  border
-                  ${
-                    active === card.id
-                      ? "border-white scale-105"
-                      : "border-white/10"
-                  }
-                `}
-              >
-                <Icon size={42} />
-
-                <p className="mt-4 text-xl font-bold">
-                  {card.title}
-                </p>
-              </div>
-            );
-          })}
+          <span className="text-sm text-gray-300">
+            AI destekli yaşam simülasyonu
+          </span>
 
         </div>
 
-        {/* RIGHT PANEL */}
-        <div className="w-full lg:w-[420px] sticky top-6 bg-white/5 border border-white/10 rounded-[30px] p-6 backdrop-blur-xl min-h-[750px] shadow-[0_0_50px_rgba(255,255,255,0.06)]">
+        <h1 className="mt-8 text-6xl md:text-7xl font-black bg-gradient-to-r from-white via-gray-300 to-gray-600 bg-clip-text text-transparent">
+          Hayat Analizi AI
+        </h1>
 
-          {active === "time" && <TimePanel />}
+        <p className="mt-6 text-gray-400 text-lg max-w-2xl mx-auto">
+          Hayatının görünmeyen istatistiklerini,
+          zaman kullanımını ve yaşam projeksiyonunu keşfet.
+        </p>
 
-          {active !== "time" && (
-            <Coming />
+      </div>
+
+      {/* CONTENT */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 grid lg:grid-cols-[1fr_430px] gap-8 items-start">
+
+        {/* LEFT */}
+        <div className="space-y-8">
+
+          {/* HERO */}
+          <div className="relative overflow-hidden rounded-[36px] border border-white/10 bg-white/5 p-8 backdrop-blur-2xl">
+
+            <div className="absolute top-0 right-0 w-60 h-60 bg-pink-500/10 blur-[100px] rounded-full" />
+
+            <div className="relative z-10">
+
+              <div className="flex items-center gap-4">
+
+                <div className="p-4 rounded-3xl bg-pink-500/10 border border-pink-500/20">
+                  <Brain
+                    size={40}
+                    className="text-pink-400"
+                  />
+                </div>
+
+                <div>
+
+                  <h2 className="text-4xl font-black">
+                    Yaşam Yüzdesi AI
+                  </h2>
+
+                  <p className="text-gray-400 mt-2">
+                    Yapay zeka destekli yaşam analizi
+                  </p>
+
+                </div>
+
+              </div>
+
+              {/* INPUTS */}
+              <div className="mt-10 grid md:grid-cols-2 gap-4">
+
+                <input
+                  type="date"
+                  value={birthDate}
+                  onChange={(e) =>
+                    setBirthDate(
+                      e.target.value
+                    )
+                  }
+                  className="bg-black/40 border border-white/10 rounded-2xl p-4 outline-none focus:border-pink-500 transition-all"
+                />
+
+                <input
+                  type="number"
+                  placeholder="Günde kaç saat boşa gidiyor?"
+                  value={dailyLostHours}
+                  onChange={(e) =>
+                    setDailyLostHours(
+                      e.target.value
+                    )
+                  }
+                  className="bg-black/40 border border-white/10 rounded-2xl p-4 outline-none focus:border-pink-500 transition-all"
+                />
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* STATS */}
+          {analysis && (
+            <>
+              {/* MAIN STAT */}
+              <div className="rounded-[36px] bg-gradient-to-br from-pink-500/20 to-purple-900/20 border border-pink-500/20 p-10 text-center">
+
+                <p className="text-gray-300 text-lg">
+                  Hayatının yaşanan kısmı
+                </p>
+
+                <h1 className="text-[120px] leading-none font-black bg-gradient-to-b from-white to-gray-500 bg-clip-text text-transparent mt-4">
+                  %{analysis.lifePercent}
+                </h1>
+
+                <p className="text-pink-300 text-xl mt-6 font-semibold">
+                  {analysis.aura}
+                </p>
+
+              </div>
+
+              {/* MINI CARDS */}
+              <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+                <MiniCard
+                  icon={<Calendar />}
+                  title="Yaşanan Gün"
+                  value={analysis.livedDays.toLocaleString()}
+                />
+
+                <MiniCard
+                  icon={<Clock3 />}
+                  title="Yaş"
+                  value={`${analysis.livedYears}`}
+                />
+
+                <MiniCard
+                  icon={<TrendingUp />}
+                  title="Kalan Gün"
+                  value={analysis.remainingDays.toLocaleString()}
+                />
+
+                <MiniCard
+                  icon={<HeartPulse />}
+                  title="Yaşam Skoru"
+                  value={`${analysis.score}/100`}
+                />
+
+              </div>
+
+              {/* LIVE */}
+              <div className="rounded-[36px] border border-cyan-500/20 bg-cyan-500/10 p-8">
+
+                <p className="text-cyan-300 text-lg">
+                  Canlı yaşam sayacı
+                </p>
+
+                <h1 className="mt-4 text-6xl font-black text-cyan-400">
+                  {secondsAlive.toLocaleString()}
+                </h1>
+
+                <p className="text-gray-400 mt-3">
+                  saniyedir hayattasın
+                </p>
+
+              </div>
+
+              {/* PROGRESS */}
+              <div className="rounded-[36px] border border-white/10 bg-white/5 p-8">
+
+                <div className="flex justify-between mb-5">
+
+                  <span className="text-gray-400">
+                    Hayat ilerleme seviyesi
+                  </span>
+
+                  <span className="font-bold">
+                    %{analysis.lifePercent}
+                  </span>
+
+                </div>
+
+                <div className="h-6 rounded-full bg-white/10 overflow-hidden">
+
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-1000"
+                    style={{
+                      width: `${analysis.lifePercent}%`,
+                    }}
+                  />
+
+                </div>
+
+              </div>
+
+              {/* AI ANALYSIS */}
+              <div className="grid xl:grid-cols-2 gap-6">
+
+                <div className="rounded-[36px] border border-white/10 bg-white/5 p-8">
+
+                  <div className="flex items-center gap-3 mb-5">
+
+                    <Brain className="text-pink-400" />
+
+                    <h3 className="text-2xl font-black">
+                      AI Yorumu
+                    </h3>
+
+                  </div>
+
+                  <p className="text-gray-300 leading-8 text-lg">
+                    {analysis.ai}
+                  </p>
+
+                </div>
+
+                <div className="rounded-[36px] border border-red-500/20 bg-red-500/10 p-8">
+
+                  <div className="flex items-center gap-3 mb-5">
+
+                    <AlertTriangle className="text-red-400" />
+
+                    <h3 className="text-2xl font-black text-red-300">
+                      Risk Analizi
+                    </h3>
+
+                  </div>
+
+                  <p className="text-red-200 text-2xl font-bold">
+                    {analysis.risk}
+                  </p>
+
+                  <p className="text-red-200/70 mt-4 leading-7">
+                    Bu alışkanlık devam ederse yaklaşık{" "}
+                    {
+                      analysis.projectedLostYears
+                    }{" "}
+                    yıl kaybedebilirsin.
+                  </p>
+
+                </div>
+
+              </div>
+            </>
           )}
+        </div>
+
+        {/* RIGHT PANEL */}
+        <div className="sticky top-6 space-y-6">
+
+          {/* SHARE */}
+          <button
+            onClick={share}
+            className="w-full rounded-[28px] bg-gradient-to-r from-pink-500 to-purple-600 p-5 font-bold flex items-center justify-center gap-3 hover:scale-105 transition-all duration-300 shadow-[0_20px_80px_rgba(255,0,120,0.25)]"
+          >
+
+            <Share2 />
+
+            Sonucu Paylaş
+
+          </button>
+
+          {/* AI PANEL */}
+          <div className="rounded-[36px] border border-white/10 bg-white/5 p-8 backdrop-blur-2xl">
+
+            <div className="flex items-center gap-3 mb-5">
+
+              <Activity className="text-green-400" />
+
+              <h3 className="text-2xl font-black">
+                AI Önerileri
+              </h3>
+
+            </div>
+
+            <div className="space-y-4">
+
+              <Suggestion text="Günde 1 saat kazanırsan yılda yaklaşık 15 gün geri alabilirsin." />
+
+              <Suggestion text="Telefon kullanımını azaltmak yaşam skorunu yükseltebilir." />
+
+              <Suggestion text="En verimli saatlerini dikkat dağıtıcı şeylerden koru." />
+
+              <Suggestion text="Zamanını bilinçli yönetmek uzun vadede hayat kaliteni artırır." />
+
+            </div>
+
+          </div>
+
+          {/* FUTURE */}
+          <div className="rounded-[36px] border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8">
+
+            <h3 className="text-2xl font-black">
+              Yakında 🚀
+            </h3>
+
+            <div className="mt-6 space-y-4 text-gray-300">
+
+              <p>• Gerçek AI sohbet sistemi</p>
+
+              <p>• Kişilik analizi</p>
+
+              <p>• Yaşam haritası</p>
+
+              <p>• Günlük zaman takibi</p>
+
+              <p>• AI yaşam koçu</p>
+
+            </div>
+
+          </div>
 
         </div>
 
@@ -171,333 +458,50 @@ export default function Home() {
   );
 }
 
-/* TIME PANEL */
+/* MINI CARD */
 
-function TimePanel() {
-  const [hours, setHours] = useState("");
-  const [age, setAge] = useState("");
-
-  const [seconds, setSeconds] = useState(0);
-
-  const [result, setResult] = useState<any>(null);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSeconds((prev) => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const calculate = () => {
-    const h = Number(hours);
-    const a = Number(age);
-
-    if (!h || !a) return;
-
-    const yearlyLostDays = Math.round((h * 365) / 24);
-
-    const yearlyLostHours = h * 365;
-
-    const projectedLostYears = (
-      (yearlyLostDays * a) /
-      365
-    ).toFixed(1);
-
-    const lifeScore = Math.max(
-      0,
-      100 - yearlyLostDays
-    );
-
-    let risk = "";
-    let ai = "";
-    let advice = "";
-
-    if (yearlyLostDays < 15) {
-      risk = "Düşük Risk";
-      ai =
-        "Zaman kullanımın şu an kontrol altında görünüyor.";
-      advice =
-        "Bu alışkanlığı azaltırsan ciddi avantaj elde edebilirsin.";
-    } else if (yearlyLostDays < 40) {
-      risk = "Orta Risk";
-      ai =
-        "Bu alışkanlık hayatının önemli kısmını tüketiyor.";
-      advice =
-        "Günde sadece 1 saat azaltman bile yılda haftalar kazandırabilir.";
-    } else {
-      risk = "Yüksek Risk";
-      ai =
-        "Bu alışkanlık zamanını sessizce tüketiyor olabilir.";
-      advice =
-        "Bu düzende devam edersen yıllarını kaybedebilirsin.";
-    }
-
-    const possibilities = [
-      "1 yabancı dil öğrenebilirdin 🌍",
-      "Kendi işini kurabilirdin 💼",
-      "Yüzlerce kitap okuyabilirdin 📚",
-      "Yazılım öğrenebilirdin 💻",
-      "Profesyonel spor seviyesine yaklaşabilirdin 💪",
-      "Dünyayı gezebilirdin ✈️",
-    ];
-
-    const random =
-      possibilities[
-        Math.floor(
-          Math.random() * possibilities.length
-        )
-      ];
-
-    setResult({
-      yearlyLostDays,
-      yearlyLostHours,
-      projectedLostYears,
-      lifeScore,
-      risk,
-      ai,
-      advice,
-      random,
-    });
-  };
-
-  const share = async () => {
-    if (!result) return;
-
-    await navigator.share?.({
-      title: "Hayat Analizi AI",
-      text: `Yılda ${result.yearlyLostDays} gün kaybediyorum 😳`,
-      url: window.location.href,
-    });
-  };
-
+function MiniCard({
+  icon,
+  title,
+  value,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  value: string;
+}) {
   return (
-    <div>
+    <div className="rounded-[30px] border border-white/10 bg-white/5 p-6 backdrop-blur-2xl hover:scale-[1.03] transition-all duration-300">
 
-      {/* HEADER */}
-      <div className="flex items-center gap-3 mb-2">
-        <Brain className="text-red-400" />
+      <div className="flex items-center justify-between">
 
-        <h2 className="text-4xl font-black">
-          Zaman AI Analizi
-        </h2>
-      </div>
-
-      <p className="text-gray-400 mb-8">
-        Yapay zeka destekli zaman analizi sistemi.
-      </p>
-
-      {/* INPUTS */}
-      <div className="space-y-4">
-
-        <input
-          type="number"
-          placeholder="Günde kaç saatini boşa harcıyorsun?"
-          value={hours}
-          onChange={(e) =>
-            setHours(e.target.value)
-          }
-          className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 outline-none focus:border-red-500 transition-all"
-        />
-
-        <input
-          type="number"
-          placeholder="Kaç yaşındasın?"
-          value={age}
-          onChange={(e) =>
-            setAge(e.target.value)
-          }
-          className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 outline-none focus:border-red-500 transition-all"
-        />
-
-        <button
-          onClick={calculate}
-          className="w-full bg-white text-black rounded-2xl p-4 font-black hover:scale-105 transition-all"
-        >
-          AI Analizini Başlat
-        </button>
-
-      </div>
-
-      {/* LIVE COUNTER */}
-      <div className="mt-6 bg-white/5 border border-white/10 rounded-3xl p-5">
-
-        <p className="text-gray-400 text-sm">
-          Canlı süre sayacı
-        </p>
-
-        <h1 className="text-5xl font-black text-cyan-400 mt-2">
-          {seconds}s
-        </h1>
-
-      </div>
-
-      {/* RESULTS */}
-      {result && (
-        <div className="mt-8 space-y-6 animate-in fade-in duration-500">
-
-          {/* MAIN */}
-          <div className="rounded-3xl bg-gradient-to-br from-red-500/20 to-red-900/20 border border-red-500/20 p-6 text-center">
-
-            <h1 className="text-8xl font-black text-red-500">
-              {result.yearlyLostDays}
-            </h1>
-
-            <p className="text-gray-300 mt-2">
-              yılda kaybedilen gün
-            </p>
-
-            <div className="mt-6 flex justify-center">
-
-              <div className="bg-red-500/20 border border-red-500/20 px-4 py-2 rounded-full flex items-center gap-2">
-                <AlertTriangle size={18} />
-
-                <span className="font-semibold">
-                  {result.risk}
-                </span>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* LIFE SCORE */}
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-5">
-
-            <div className="flex items-center gap-3 mb-4">
-              <Activity className="text-green-400" />
-
-              <h3 className="text-xl font-bold">
-                Yaşam Skoru
-              </h3>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400">
-                Genel skor
-              </span>
-
-              <span className="text-4xl font-black text-green-400">
-                {result.lifeScore}/100
-              </span>
-            </div>
-
-            <div className="mt-4 h-4 bg-white/10 rounded-full overflow-hidden">
-
-              <div
-                className="h-full bg-green-400 rounded-full"
-                style={{
-                  width: `${result.lifeScore}%`,
-                }}
-              />
-
-            </div>
-
-          </div>
-
-          {/* AI ANALYSIS */}
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-5">
-
-            <h3 className="text-xl font-bold mb-4">
-              AI Yorumu 🤖
-            </h3>
-
-            <p className="text-gray-300 leading-8">
-              {result.ai}
-            </p>
-
-          </div>
-
-          {/* ADVICE */}
-          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-3xl p-5">
-
-            <h3 className="text-xl font-bold mb-4 text-yellow-400">
-              AI Tavsiyesi
-            </h3>
-
-            <p className="text-yellow-200 leading-8">
-              {result.advice}
-            </p>
-
-          </div>
-
-          {/* PROJECTION */}
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-5">
-
-            <h3 className="text-xl font-bold mb-4">
-              Hayat Projeksiyonu
-            </h3>
-
-            <div className="space-y-4">
-
-              <div className="flex justify-between">
-                <span className="text-gray-400">
-                  Yıllık kayıp saat
-                </span>
-
-                <span className="font-bold">
-                  {result.yearlyLostHours}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-gray-400">
-                  Tahmini ömür kaybı
-                </span>
-
-                <span className="font-bold text-red-400">
-                  {result.projectedLostYears} yıl
-                </span>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* POSSIBILITY */}
-          <div className="bg-green-500/10 border border-green-500/20 rounded-3xl p-5">
-
-            <h3 className="text-xl font-bold mb-4 text-green-400">
-              Bu sürede şunu yapabilirdin
-            </h3>
-
-            <p className="text-green-200 text-lg">
-              {result.random}
-            </p>
-
-          </div>
-
-          {/* SHARE */}
-          <button
-            onClick={share}
-            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl p-4 flex items-center justify-center gap-3 font-bold hover:scale-105 transition-all"
-          >
-            <Share2 />
-
-            Sonucu Paylaş
-          </button>
-
+        <div className="p-3 rounded-2xl bg-white/10">
+          {icon}
         </div>
-      )}
+
+        <span className="text-gray-400 text-sm">
+          {title}
+        </span>
+
+      </div>
+
+      <h3 className="mt-8 text-4xl font-black">
+        {value}
+      </h3>
 
     </div>
   );
 }
 
-function Coming() {
+/* SUGGESTION */
+
+function Suggestion({
+  text,
+}: {
+  text: string;
+}) {
   return (
-    <div className="h-full flex items-center justify-center text-center">
-
-      <div>
-        <h2 className="text-4xl font-black">
-          Yakında Aktif 🚀
-        </h2>
-
-        <p className="text-gray-400 mt-4">
-          Yeni analiz sistemleri hazırlanıyor
-        </p>
-      </div>
-
+    <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-gray-300 leading-7">
+      {text}
     </div>
   );
 }
