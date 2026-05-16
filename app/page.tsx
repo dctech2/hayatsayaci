@@ -41,6 +41,7 @@ export default function Home() {
     if (!birthDate) return null;
 
     const birth = new Date(birthDate);
+    if (birth >= new Date()) return null;
 
     const now = new Date();
 
@@ -64,8 +65,10 @@ export default function Home() {
       )
     );
 
-    const remainingDays =
-      averageLifeDays - livedDays;
+    const remainingDays = Math.max(
+      0,
+      averageLifeDays - livedDays
+    );
 
     const lostHours =
       Number(dailyLostHours || 0);
@@ -133,11 +136,20 @@ export default function Home() {
   const share = async () => {
     if (!analysis) return;
 
-    await navigator.share?.({
-      title: "Hayat Analizi AI",
-      text: `😳 Hayatımın %${analysis.lifePercent}'ini yaşadım!`,
-      url: window.location.href,
-    });
+    const text = `😳 Hayatımın %${analysis.lifePercent}'ini yaşadım!`;
+
+    if (navigator.share) {
+      await navigator.share({
+        title: "Hayat Analizi AI",
+        text,
+        url: window.location.href,
+      });
+    } else {
+      await navigator.clipboard.writeText(
+        `${text} ${window.location.href}`
+      );
+      alert("Bağlantı panoya kopyalandı!");
+    }
   };
 
   return (
@@ -214,6 +226,7 @@ export default function Home() {
                 <input
                   type="date"
                   value={birthDate}
+                  max={new Date().toISOString().split("T")[0]}
                   onChange={(e) =>
                     setBirthDate(
                       e.target.value
@@ -226,11 +239,13 @@ export default function Home() {
                   type="number"
                   placeholder="Günde kaç saat boşa gidiyor?"
                   value={dailyLostHours}
-                  onChange={(e) =>
-                    setDailyLostHours(
-                      e.target.value
-                    )
-                  }
+                  min={0}
+                  max={24}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (val >= 0 && val <= 24)
+                      setDailyLostHours(e.target.value);
+                  }}
                   className="bg-black/40 border border-white/10 rounded-2xl p-4 outline-none focus:border-pink-500 transition-all"
                 />
 
