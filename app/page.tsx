@@ -116,6 +116,7 @@ export default function Home() {
   return (
     <main className={`min-h-screen ${d("bg-black text-white", "bg-gray-50 text-gray-900")} overflow-hidden relative transition-colors duration-300`}>
 
+
       {/* BACKGROUND */}
       <div className={`absolute top-0 left-0 w-[700px] h-[700px] ${d("bg-pink-500/10", "bg-pink-400/15")} blur-[150px] rounded-full`} />
       <div className={`absolute bottom-0 right-0 w-[700px] h-[700px] ${d("bg-cyan-500/10", "bg-cyan-400/15")} blur-[150px] rounded-full`} />
@@ -196,7 +197,9 @@ export default function Home() {
                   className={`${d("bg-black/40 border-white/10 text-white placeholder:text-gray-500", "bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400")} border rounded-2xl p-4 outline-none focus:border-pink-500 transition-all`}
                 />
               </div>
-
+<label className="mb-2 block text-sm text-gray-400">
+  Doğum tarihi
+</label>
               <p className={`mt-4 text-xs ${d("text-gray-500", "text-gray-400")}`}>
                 * Hesaplamalar TÜİK verilerine göre Türkiye ortalama insan ömrü olan <span className="font-semibold">75 yıl</span> baz alınarak yapılmaktadır.
               </p>
