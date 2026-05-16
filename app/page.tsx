@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import {
   Brain,
@@ -21,6 +21,7 @@ export default function Home() {
   const [birthDate, setBirthDate] = useState("");
   const [dailyLostHours, setDailyLostHours] = useState("");
   const [secondsAlive, setSecondsAlive] = useState(0);
+  const [animatedPercent, setAnimatedPercent] = useState(0);
 
   const d = (dk: string, lt: string) => (isDark ? dk : lt);
 
@@ -35,6 +36,7 @@ export default function Home() {
   }, [birthDate]);
 
   const analysis = useMemo(() => {
+
     if (!birthDate) return null;
     const birth = new Date(birthDate);
     if (birth >= new Date()) return null;
@@ -92,6 +94,13 @@ export default function Home() {
       score,
     };
   }, [birthDate, dailyLostHours]);
+
+  useEffect(() => {
+    if (!analysis) { setAnimatedPercent(0); return; }
+    setAnimatedPercent(0);
+    const t = setTimeout(() => setAnimatedPercent(analysis.lifePercent), 700);
+    return () => clearTimeout(t);
+  }, [analysis]);
 
   const share = async () => {
     if (!analysis) return;
@@ -196,9 +205,12 @@ export default function Home() {
 
           {/* STATS */}
           {analysis && (
-            <>
+            <React.Fragment key={birthDate}>
               {/* MAIN STAT */}
-              <div className={`rounded-[36px] bg-gradient-to-br ${d("from-pink-500/20 to-purple-900/20 border-pink-500/20", "from-pink-50 to-purple-50 border-pink-200")} border p-10 text-center`}>
+              <div
+                className={`anim-pop rounded-[36px] bg-gradient-to-br ${d("from-pink-500/20 to-purple-900/20 border-pink-500/20", "from-pink-50 to-purple-50 border-pink-200")} border p-10 text-center`}
+                style={{ animationDelay: "0ms" }}
+              >
                 <p className={`${d("text-gray-300", "text-gray-600")} text-lg`}>
                   Hayatının yaşanan kısmı
                 </p>
@@ -212,14 +224,17 @@ export default function Home() {
 
               {/* MINI CARDS */}
               <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
-                <MiniCard isDark={isDark} icon={<Calendar />} title="Yaşanan Gün" value={analysis.livedDays.toLocaleString()} />
-                <MiniCard isDark={isDark} icon={<Clock3 />} title="Yaş" value={`${analysis.livedYears}`} />
-                <MiniCard isDark={isDark} icon={<TrendingUp />} title="Kalan Gün" value={analysis.remainingDays.toLocaleString()} />
-                <MiniCard isDark={isDark} icon={<HeartPulse />} title="Yaşam Skoru" value={`${analysis.score}/100`} />
+                <MiniCard isDark={isDark} delay={150} icon={<Calendar />} title="Yaşanan Gün" value={analysis.livedDays.toLocaleString()} />
+                <MiniCard isDark={isDark} delay={230} icon={<Clock3 />} title="Yaş" value={`${analysis.livedYears}`} />
+                <MiniCard isDark={isDark} delay={310} icon={<TrendingUp />} title="Kalan Gün" value={analysis.remainingDays.toLocaleString()} />
+                <MiniCard isDark={isDark} delay={390} icon={<HeartPulse />} title="Yaşam Skoru" value={`${analysis.score}/100`} />
               </div>
 
               {/* LIVE */}
-              <div className={`rounded-[36px] border ${d("border-cyan-500/20 bg-cyan-500/10", "border-cyan-200 bg-cyan-50")} p-8`}>
+              <div
+                className={`anim-slide rounded-[36px] border ${d("border-cyan-500/20 bg-cyan-500/10", "border-cyan-200 bg-cyan-50")} p-8`}
+                style={{ animationDelay: "480ms" }}
+              >
                 <p className={`${d("text-cyan-300", "text-cyan-700")} text-lg`}>
                   Canlı yaşam sayacı
                 </p>
@@ -232,7 +247,10 @@ export default function Home() {
               </div>
 
               {/* PROGRESS */}
-              <div className={`rounded-[36px] border ${d("border-white/10 bg-white/5", "border-gray-200 bg-white shadow-sm")} p-8`}>
+              <div
+                className={`anim-slide rounded-[36px] border ${d("border-white/10 bg-white/5", "border-gray-200 bg-white shadow-sm")} p-8`}
+                style={{ animationDelay: "580ms" }}
+              >
                 <div className="flex justify-between mb-5">
                   <span className={d("text-gray-400", "text-gray-500")}>
                     Hayat ilerleme seviyesi
@@ -241,14 +259,17 @@ export default function Home() {
                 </div>
                 <div className={`h-6 rounded-full ${d("bg-white/10", "bg-gray-200")} overflow-hidden`}>
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-1000"
-                    style={{ width: `${analysis.lifePercent}%` }}
+                    className="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-[1200ms] ease-out"
+                    style={{ width: `${animatedPercent}%` }}
                   />
                 </div>
               </div>
 
               {/* AI ANALYSIS */}
-              <div className="grid xl:grid-cols-2 gap-6">
+              <div
+                className="grid xl:grid-cols-2 gap-6 anim-slide"
+                style={{ animationDelay: "700ms" }}
+              >
                 <div className={`rounded-[36px] border ${d("border-white/10 bg-white/5", "border-gray-200 bg-white shadow-sm")} p-8`}>
                   <div className="flex items-center gap-3 mb-5">
                     <Brain className="text-pink-400" />
@@ -274,7 +295,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-            </>
+            </React.Fragment>
           )}
         </div>
 
@@ -326,17 +347,22 @@ export default function Home() {
 
 function MiniCard({
   isDark,
+  delay,
   icon,
   title,
   value,
 }: {
   isDark: boolean;
+  delay?: number;
   icon: React.ReactNode;
   title: string;
   value: string;
 }) {
   return (
-    <div className={`rounded-[30px] border ${isDark ? "border-white/10 bg-white/5" : "border-gray-200 bg-white shadow-sm"} p-6 backdrop-blur-2xl hover:scale-[1.03] transition-all duration-300`}>
+    <div
+      className={`anim-slide rounded-[30px] border ${isDark ? "border-white/10 bg-white/5" : "border-gray-200 bg-white shadow-sm"} p-6 backdrop-blur-2xl hover:scale-[1.03] transition-all duration-300`}
+      style={delay !== undefined ? { animationDelay: `${delay}ms` } : undefined}
+    >
       <div className="flex items-center justify-between">
         <div className={`p-3 rounded-2xl ${isDark ? "bg-white/10" : "bg-gray-100"}`}>
           {icon}
