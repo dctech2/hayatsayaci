@@ -183,7 +183,7 @@ export default function Home() {
                   value={birthDate}
                   max={new Date().toISOString().split("T")[0]}
                   onChange={(e) => setBirthDate(e.target.value)}
-                  className={`${d("bg-black/40 border-white/10 text-white", "bg-gray-50 border-gray-300 text-gray-900")} border rounded-2xl p-4 outline-none focus:border-pink-500 transition-all`}
+                  className={`${d("bg-black/40 border-white/10 text-white [color-scheme:dark]", "bg-gray-50 border-gray-300 text-gray-900 [color-scheme:light]")} border rounded-2xl p-4 outline-none focus:border-pink-500 transition-all w-full`}
                 />
                 <input
                   type="number"
