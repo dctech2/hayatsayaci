@@ -184,7 +184,10 @@ export default function Home() {
                     value={birthDate}
                     max={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setBirthDate(e.target.value)}
-                    className={`peer ${d("bg-black/40 border-white/10 text-white [color-scheme:dark]", "bg-gray-50 border-gray-300 text-gray-900 [color-scheme:light]")} border rounded-2xl p-4 outline-none focus:border-pink-500 transition-all w-full`}
+                    className={`peer ${d(
+                        `bg-black/40 border-white/10 [color-scheme:dark] ${!birthDate ? "text-transparent focus:text-white" : "text-white"}`,
+                        `bg-gray-50 border-gray-300 [color-scheme:light] ${!birthDate ? "text-transparent focus:text-gray-900" : "text-gray-900"}`
+                      )} border rounded-2xl p-4 outline-none focus:border-pink-500 transition-all w-full`}
                   />
                   {!birthDate && (
                     <span className={`absolute inset-0 flex items-center px-4 pointer-events-none peer-focus:hidden ${d("text-gray-500", "text-gray-400")}`}>
