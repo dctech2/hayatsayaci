@@ -178,13 +178,20 @@ export default function Home() {
 
               {/* INPUTS */}
               <div className="mt-10 grid md:grid-cols-2 gap-4">
-                <input
-                  type="date"
-                  value={birthDate}
-                  max={new Date().toISOString().split("T")[0]}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                  className={`${d("bg-black/40 border-white/10 text-white [color-scheme:dark]", "bg-gray-50 border-gray-300 text-gray-900 [color-scheme:light]")} border rounded-2xl p-4 outline-none focus:border-pink-500 transition-all w-full`}
-                />
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={birthDate}
+                    max={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    className={`${d("bg-black/40 border-white/10 text-white [color-scheme:dark]", "bg-gray-50 border-gray-300 text-gray-900 [color-scheme:light]")} border rounded-2xl p-4 outline-none focus:border-pink-500 transition-all w-full`}
+                  />
+                  {!birthDate && (
+                    <span className={`absolute inset-0 flex items-center px-4 pointer-events-none ${d("text-gray-500", "text-gray-400")}`}>
+                      Doğum tarihinizi giriniz
+                    </span>
+                  )}
+                </div>
                 <input
                   type="number"
                   placeholder="Günde kaç saat boşa gidiyor?"
