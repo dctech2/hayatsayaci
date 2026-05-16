@@ -187,6 +187,10 @@ export default function Home() {
                   className={`${d("bg-black/40 border-white/10 text-white placeholder:text-gray-500", "bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400")} border rounded-2xl p-4 outline-none focus:border-pink-500 transition-all`}
                 />
               </div>
+
+              <p className={`mt-4 text-xs ${d("text-gray-500", "text-gray-400")}`}>
+                * Hesaplamalar TÜİK verilerine göre Türkiye ortalama insan ömrü olan <span className="font-semibold">75 yıl</span> baz alınarak yapılmaktadır.
+              </p>
             </div>
           </div>
 
