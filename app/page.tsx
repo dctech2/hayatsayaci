@@ -121,10 +121,10 @@ export default function Home() {
       <div className={`absolute bottom-0 right-0 w-[700px] h-[700px] ${d("bg-cyan-500/10", "bg-cyan-400/15")} blur-[150px] rounded-full`} />
 
       {/* HEADER */}
-      <div className="relative z-10 text-center pt-12 px-6">
+      <div className="relative z-10 pt-12 px-6">
 
         {/* THEME TOGGLE */}
-        <div className="absolute right-6 top-12">
+        <div className="flex justify-end mb-4">
           <button
             onClick={() => setIsDark(!isDark)}
             className={`p-3 rounded-2xl border transition-all duration-300 ${d("bg-white/5 border-white/10 hover:bg-white/10 text-yellow-300", "bg-white border-gray-200 hover:bg-gray-100 text-gray-600 shadow-sm")}`}
@@ -133,6 +133,7 @@ export default function Home() {
           </button>
         </div>
 
+        <div className="text-center">
         <div className={`inline-flex items-center gap-3 px-5 py-2 rounded-full ${d("bg-white/5 border-white/10", "bg-white border-gray-200 shadow-sm")} border backdrop-blur-xl`}>
           <Sparkles className="text-pink-400" />
           <span className={`text-sm ${d("text-gray-300", "text-gray-600")}`}>
@@ -140,7 +141,7 @@ export default function Home() {
           </span>
         </div>
 
-        <h1 className={`mt-8 text-6xl md:text-7xl font-black bg-gradient-to-r ${d("from-white via-gray-300 to-gray-600", "from-gray-900 via-gray-700 to-gray-500")} bg-clip-text text-transparent`}>
+        <h1 className={`mt-8 text-4xl sm:text-6xl md:text-7xl font-black bg-gradient-to-r ${d("from-white via-gray-300 to-gray-600", "from-gray-900 via-gray-700 to-gray-500")} bg-clip-text text-transparent`}>
           Hayat Analizi AI
         </h1>
 
@@ -149,6 +150,7 @@ export default function Home() {
           zaman kullanımını ve yaşam projeksiyonunu keşfet.
         </p>
 
+        </div>
       </div>
 
       {/* CONTENT */}
@@ -208,13 +210,13 @@ export default function Home() {
             <React.Fragment key={birthDate}>
               {/* MAIN STAT */}
               <div
-                className={`anim-pop rounded-[36px] bg-gradient-to-br ${d("from-pink-500/20 to-purple-900/20 border-pink-500/20", "from-pink-50 to-purple-50 border-pink-200")} border p-10 text-center`}
+                className={`anim-pop rounded-[36px] bg-gradient-to-br ${d("from-pink-500/20 to-purple-900/20 border-pink-500/20", "from-pink-50 to-purple-50 border-pink-200")} border p-8 sm:p-10 text-center`}
                 style={{ animationDelay: "0ms" }}
               >
                 <p className={`${d("text-gray-300", "text-gray-600")} text-lg`}>
                   Hayatının yaşanan kısmı
                 </p>
-                <h1 className={`text-[120px] leading-none font-black bg-gradient-to-b ${d("from-white to-gray-500", "from-gray-900 to-gray-400")} bg-clip-text text-transparent mt-4`}>
+                <h1 className={`text-[72px] sm:text-[120px] leading-none font-black bg-gradient-to-b ${d("from-white to-gray-500", "from-gray-900 to-gray-400")} bg-clip-text text-transparent mt-4`}>
                   %{analysis.lifePercent}
                 </h1>
                 <p className={`${d("text-pink-300", "text-pink-600")} text-xl mt-6 font-semibold`}>
@@ -238,7 +240,7 @@ export default function Home() {
                 <p className={`${d("text-cyan-300", "text-cyan-700")} text-lg`}>
                   Canlı yaşam sayacı
                 </p>
-                <h1 className={`mt-4 text-6xl font-black ${d("text-cyan-400", "text-cyan-600")}`}>
+                <h1 className={`mt-4 text-4xl sm:text-6xl font-black ${d("text-cyan-400", "text-cyan-600")} break-all`}>
                   {secondsAlive.toLocaleString()}
                 </h1>
                 <p className={`${d("text-gray-400", "text-gray-500")} mt-3`}>
